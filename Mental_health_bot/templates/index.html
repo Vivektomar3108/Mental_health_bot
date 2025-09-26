@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Mental Health Assistant</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; text-align: center; }
+        .chat-box { width: 60%; margin: 20px auto; background: white; padding: 20px; border-radius: 10px; }
+        .message { margin: 10px; padding: 10px; border-radius: 8px; }
+        .user { background: #007bff; color: white; text-align: right; }
+        .bot { background: #e4e6eb; text-align: left; }
+    </style>
+</head>
+<body>
+    <h2>Hi Priya, I'm listening...</h2>
+    <button onclick="startRecording()">🎤 Tap to start speaking</button>
+    <div id="chat" class="chat-box"></div>
+
+    <script>
+        async function sendMessage(message) {
+            document.getElementById("chat").innerHTML += `<div class="message user">${message}</div>`;
+            
+            let response = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message })
+            });
+            
+            let data = await response.json();
+            document.getElementById("chat").innerHTML += `<div class="message bot">${data.response}</div>`;
+        }
+
+        // Speech recognition (Web Speech API)
+        function startRecording() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                let transcript = event.results[0][0].transcript;
+                sendMessage(transcript);
+            };
+        }
+    </script>
+</body>
+</html>
